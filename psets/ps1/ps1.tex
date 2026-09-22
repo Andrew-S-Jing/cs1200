@@ -1,5 +1,9 @@
 \documentclass[11pt]{article}
-\usepackage{Fall26/cs1200}
+
+% The course style files assume a book/report class (they number theorems and
+% algorithms within chapters), so give `article` a chapter counter to hook into.
+\newcounter{chapter}
+\usepackage{cs1200}
 \usepackage{graphicx}
 \usepackage{float}
 
@@ -14,72 +18,115 @@ All sources of ideas, including (but not restricted to) any collaborators, AI to
 If you did not have any collaborators or external resources, please write 'none.' Please remember to select pages when you submit on Gradescope. A problem set on the border between two letter grades cannot be rounded up if pages are not selected OR collaborators not noted.
 \newline
 
-\textbf{Your name: }
+\textbf{Your name: Andrew Jing}
 
-\textbf{Collaborators and External Resources:}
+\textbf{Collaborators and External Resources: Claude Code translated handwritten answers into this latex file}
 
-\textbf{No. of late days used on previous psets: }
+\textbf{No. of late days used on previous psets: 0}
 
-\textbf{No. of late days used after including this pset: }
+\textbf{No. of late days used after including this pset: 1}
 
 \vspace{1em}
 
 \newpage
 
 \begin{enumerate}
-    \item (Asymptotic Notation) 
+    \item (Asymptotic Notation)
     \begin{enumerate}
     \item (practice using asymptotic notation)
-        Fill in the table below with ``T'' (for True) or ``F'' (for False) to indicate the relationship between $f$ and $g$. For example, if $f$ is $\Omega(g)$, the first cell of the row should be ``T.''   No justification necessary.  Notice that some of the functions are the same as in Problem Set 0. Recall that, throughout CS1200, all logarithms are base 2 unless otherwise specified. 
-    
-        \begin{table}[h!] 
+        Fill in the table below with ``T'' (for True) or ``F'' (for False) to indicate the relationship between $f$ and $g$. For example, if $f$ is $\Omega(g)$, the first cell of the row should be ``T.''   No justification necessary.  Notice that some of the functions are the same as in Problem Set 0. Recall that, throughout CS1200, all logarithms are base 2 unless otherwise specified.
+
+        \begin{table}[h!]
         \centering
         \bgroup
         \def\arraystretch{1.3}
-        \begin{tabular}{||c | c || c | c | c | c | c ||}
+        \begin{tabular}{||c | c || c | c | c ||}
          \hline
          $f$ & $g$ & $\Omega$ & $\omega$ & $\Theta$ \\
          \hline\hline
-         $3(\log_2 n)^{2}$ & $2(\ln n) \cdot (\ln n + 3)$ & & & \\ \hline
-         $3n^3$ & $|\{ S \subseteq [n] : |S| \leq 5 \}|$ & & &  \\ \hline
-         $(n+1)^{n+1}$ & $(n+1) \times n!$ & & & \\ \hline
-         $4^n$ & $\left(3+(-1)^n\right)^n$ & & & \\ \hline
+         $3(\log_2 n)^{2}$ & $2(\ln n) \cdot (\ln n + 3)$ & T & F & T \\ \hline
+         $3n^3$ & $|\{ S \subseteq [n] : |S| \leq 5 \}|$ & F & F & F \\ \hline
+         $(n+1)^{n+1}$ & $(n+1) \times n!$ & T & T & F \\ \hline
+         $4^n$ & $\left(3+(-1)^n\right)^n$ & T & F& F \\ \hline
         \end{tabular}
         \egroup
         \end{table}
 
-    \item  (runtimes: $T^=$ vs. $T$)  
-    Let $g : \R^{\geq 0}\rightarrow \R^{\geq 0}$ be a nondecreasing function, i.e. if $x_0\geq x_1$, then $g(x_0)\geq g(x_1)$. (For example $g(n)=n^2$, $g(n)=n\log n$, or $g(n)=2^n$.) Let $T^{=} : \N\rightarrow \N$ and $T : \R^{\geq 0}\rightarrow \N$ be the runtimes of an algorithm $A$, as defined in Lecture 2. 
-    \begin{enumerate} 
-    \item Consider the two statements: 
+    \item  (runtimes: $T^=$ vs. $T$)
+    Let $g : \R^{\geq 0}\rightarrow \R^{\geq 0}$ be a nondecreasing function, i.e. if $x_0\geq x_1$, then $g(x_0)\geq g(x_1)$. (For example $g(n)=n^2$, $g(n)=n\log n$, or $g(n)=2^n$.) Let $T^{=} : \N\rightarrow \N$ and $T : \R^{\geq 0}\rightarrow \N$ be the runtimes of an algorithm $A$, as defined in Lecture 2.
+    \begin{enumerate}
+    \item Consider the two statements:
     $$``T^{=} = \Omega(g) \implies T = \Omega(g)''$$
-    and 
+    and
     $$``T = \Omega(g) \implies T^{=} = \Omega(g)''.$$
     One of these statements is true and one is false. Prove the correct statement. For the false statement, give an example of a potential runtime $T^{=}$ and a function $g$ to demonstrate.  (Hint: one of the pairs of functions in the table above may be helpful.)
+
+    \vspace{0.5em}
+    \noindent\textbf{Answer.} Statement 1 is true *only over naturals*, and statement 2 is false. First, we prove statement 1 with the caveat:
     
+    \smallskip
+    \noindent\textbf{Claim.} $T^{=}=\Omega(g) \implies T=\Omega(g)$ over naturals.
+
+    \begin{proof}
+    	For an algorithm $A$ with input set $\Inputs$ and size function $\mathrm{size}:\Inputs\rightarrow \N$,
+    	\[
+    	T^{=}(n)=\max\{\text{runtime of } A(x) \;:\; x\in \Inputs,\ \mathrm{size}(x)=n\},
+    	\]
+    	\[
+    	T(n)=\max\{\text{runtime of } A(x) \;:\; x\in \Inputs,\ \mathrm{size}(x)\leq n\}.
+    	\]
+    For any $n\in\N$, the set $\{x\in \Inputs : \mathrm{size}(x)\leq n\}$ is a superset of $\{x\in \Inputs : \mathrm{size}(x)= n\}$, so $T(n)$ is a maximum over a superset of the runtimes that $T^{=}(n)$ maximizes over. A maximum over a superset is at least as large, so
+    \[
+      T(n)\geq T^{=}(n) \qquad \text{for every } n\in\N.
+    \]
+    We know from the premise that $T^{=}=\Omega(g)$. By definition there are constants $c>0$ and $n_0\in\N$ such that $T^{=}(n)\geq c\cdot g(n)$ for all $n\geq n_0$. Then for all $n\geq n_0$,
+    \[
+      T(n)\;\geq\; T^{=}(n)\;\geq\; c\cdot g(n),
+    \]
+    so the same witnesses $c$ and $n_0$ show $T=\Omega(g)$ over natural numbers.
+    \end{proof}
+    
+    As a side note, the statement runs into trouble when evaluating $\Omega(g)$ over the reals. For example, if $T^=(n)=g(n)=2^{(n^2)}$ and $T(n)=T^=(\lfloor n \rfloor)$, when we run into issues. First, it's obvious that $g$ is non-decreasing, $T^==\Omega(g)$, and $T(n)\geq T^=(\lfloor n\rfloor)$, so the premise is satisfied with a valid $g$, $T$, and $T^=$. However, consider the ratio between $T(n)$ and $g(n)$:
+    
+    $$\frac{T(n)}{g(n)}=\frac{2^{(\lfloor n\rfloor^2)}}{2^{(n^2)}}=2^{\lfloor n\rfloor^2 - n^2}$$
+    
+    As $n$ grows, the above ratio approaches 0 for any fixed, non-zero decimal value of $n$ (e.g. for integer + 0.5, the ratio is $2^{(n-0.5)^2-n^2}=2^{-n+0.25}$, which approaches 0 as $n$ grows). No constant $c$ can compensate for this 0 limit, so $T$ cannot be $\Omega(g)$.
+
+    \smallskip
+    \noindent\textbf{The converse is false.} Let
+    \[
+      T^{=}(n)=\left(3+(-1)^n\right)^n=\begin{cases} 4^n & n \text{ even},\\ 2^n & n \text{ odd},\end{cases}
+      \qquad\qquad g(x)=4^x,
+    \]
+    Since $T^=(n)$ is equal to $4^n$ every other integer, for all large enough values $n$ in a function $T$, there is an $n'\in[n-2, n]$ for which $T^=(n')\geq 4^{n'}$. That means $n'$ is considered in the set that $T(n)$ maximizes over, so $T(n)\geq 4^{n'}\geq 4^{n-2}$ since $4^n$ is nondecreasing. That means that for a witness pair $c=\frac{1}{64}$ and $x_0=2$, for all $x\geq x_0$ the statement $T(x)\geq c \cdot g(x)$ holds, meaning $T=\Omega(g)$.
+    
+    However, for $T^=$, every other integer it is $2^n$, so for any $c$ and $x_0$ witnesses, we can find some larger odd $x$ for which $2^x<c\cdot 4^x$, since $4^n=\omega(2^n)$. Therefore, by counterexample the statement $T(n)=\Omega(g)\implies T^==\Omega(g)$ is false.
+    
+    \bigskip
+
     \item (Optional question\footnote{This question will be graded only if you have seriously attempted all the other questions. It can only be used to increase your grade from an $R$ to an $R^+$.}) Prove that $T^{=}=O(g)$ iff $T=O(g)$. Thus the distinction between $T$ and $T^{=}$ does not matter when we are interested in "big-oh" runtime bounds, which are nondecreasing in most ``natural'' cases.
 
-    (Hint: Recall the formal definition of big-O notation: 
-``there exist constants $c > 0$ and $n_0 \in \mathbb{N}$ such that for all 
+    (Hint: Recall the formal definition of big-O notation:
+``there exist constants $c > 0$ and $n_0 \in \mathbb{N}$ such that for all
 $n \geq n_0$, \ldots''. In the ``only if" direction, you'll need to find a constant $c$ such that the big-O inequality holds for $T$. Think about how to construct this based on the formal relationship between $T^=$ and $T$.)
 
     \end{enumerate}
 
     \end{enumerate}
-    
+
     \newpage
     \item (Understanding computational problems and mathematical notation)\\\\
     Recall the definition of a {\em computational problem} from Lecture Notes 2.  \label{prob:BC}
 
- 
-    Consider the following computational problem $\Pi=(\Inputs,\Outputs,f)$: 
-    \begin{itemize}                                
-    \item $\Inputs = \N\times\N^{\geq 2}\times \N$, where $\N^{\geq 2} = \{2,3,4,\ldots\}$.  
+
+    Consider the following computational problem $\Pi=(\Inputs,\Outputs,f)$:
+    \begin{itemize}
+    \item $\Inputs = \N\times\N^{\geq 2}\times \N$, where $\N^{\geq 2} = \{2,3,4,\ldots\}$.
     \item $\Outputs = \{(c_0,c_1,\ldots,c_{k-1}) : k,c_0,\ldots,c_{k-1}\in \N\}$
-    \item $f(n,b,k) = \{ (c_0,c_1,\ldots,c_{k-1}) : n=c_0+c_1b+c_2b^2+\cdots+c_{k-1}b^{k-1}, \forall i\ 0\leq c_i< b\}.$ 
+    \item $f(n,b,k) = \{ (c_0,c_1,\ldots,c_{k-1}) : n=c_0+c_1b+c_2b^2+\cdots+c_{k-1}b^{k-1}, \forall i\ 0\leq c_i< b\}.$
     \end{itemize}
-Here is an algorithm $\BC$ to solve $\Pi$: 
-    
+Here is an algorithm $\BC$ to solve $\Pi$:
+
 \begin{algorithm}[H]
     \BC{$n,b,k$}\\
     {
@@ -95,18 +142,47 @@ Here is an algorithm $\BC$ to solve $\Pi$:
 \begin{enumerate}
 \item If the input is $(n,b,k) = (57,12,3)$, what does the algorithm $\BC$ return? Is $\BC$'s output a valid answer for $\Pi$ with input $(57,12,3)$?
 
-\item Describe the computational problem $\Pi$ in words.  (You may find it useful to try some more examples with $b=10$.) 
+\vspace{0.5em}
+\noindent\textbf{Answer.}
+\begin{align*}
+i&=0\\
+&c_0 = 57 \bmod 12 = 9\\
+&n = (57-9)/12 = 4\\
+i&=1\\
+&c_1 = 4 \bmod 12 = 4\\
+&n = (4-4)/12 = 0\\
+i&=2\\
+&c_2 = 0 \bmod 12 = 0\\
+&n = (0-0)/12 = 0
+\end{align*}
+$n=0$, so return $(9,4,0)$.
+
+\noindent $\BC(57,12,3) = (9,4,0)$, which is a valid element of $f(57,12,3)$ since there are 3 elements in the output, $0\leq 9,4,0 < 12$, and $57 = 9\cdot 12^{0} + 4\cdot 12^{1} + 0\cdot 12^{2}$.
+
+\item Describe the computational problem $\Pi$ in words.  (You may find it useful to try some more examples with $b=10$.)
+
+\vspace{0.5em}
+\noindent\textbf{Answer.} $\Pi$ is a problem equivalent to asking to convert a number into specified base (at least 2) in a set amount of digits.
 
 \item Is there any $x\in \Inputs$ for which $f(x)=\emptyset$? If so, give an example; if not, explain why.
 
+\vspace{0.5em}
+\noindent\textbf{Answer.} Yes, the requested number may not fit into $k$ digits of base-$b$. For example, $(2,2,1)$ has an empty set of valid solutions.
+
 \item For each possible input $x\in \Inputs$, what is $|f(x)|$? ($|A|$ is the size of a set $A$.) Justify your answer(s) in one or two sentences.
 
+\vspace{0.5em}
+\noindent\textbf{Answer.} For all $(n,b,k)$ with $n\geq b^{k}$, $|f(n,b,k)| = 0$ since you can't fit $n$ into $k$ digits of base-$b$. For all other inputs, $|f(n,b,k)| = 1$ because all $\N$ are uniquely represented in base-$b$.
+
 \item Let $\Pi'=(\Inputs,\Outputs,f')$ be the problem with the same $\Inputs$ and $\Outputs$ as $\Pi$, but $f'(n,b,k) = f(n,b,k) \cup \{(0,1, \ldots,k-1)\}$. Does every algorithm $A$ that solves $\Pi$ also solve $\Pi'$? (Hint: any differences between inputs that were relevant in the previous subproblem are worth considering here.) Justify your answer with a proof or a counterexample.
+
+\vspace{0.5em}
+\noindent\textbf{Answer.} Since $|f'(n,b,k)|\geq 1$ because of the union, $A$ solves $\Pi$ does not mean $A$ solves $\Pi'$. For example, $\BC(2,2,1)$ returns $\bot$, which is invalid since $f'(2,2,1)\neq\emptyset$.
 
 \end{enumerate}
 \newpage
 
-\item (Radix Sort) In Lecture, you saw the \SingletonBucketSort, generalized to arrays of key--value pairs, and saw that it has running time $O(n+U)$ when the keys are drawn from a universe of size $U$. In this problem you'll study {\em \RadixSort}, which improves the dependence on the universe size $U$ from linear to logarithmic.  Specifically, \RadixSort\ can achieve runtime $O(n+n\cdot (\log U)/(\log n))$, so it achieves runtime $O(n)$ whenever $U = n^{O(1)}$.  
+\item (Radix Sort) In Lecture, you saw the \SingletonBucketSort, generalized to arrays of key--value pairs, and saw that it has running time $O(n+U)$ when the keys are drawn from a universe of size $U$. In this problem you'll study {\em \RadixSort}, which improves the dependence on the universe size $U$ from linear to logarithmic.  Specifically, \RadixSort\ can achieve runtime $O(n+n\cdot (\log U)/(\log n))$, so it achieves runtime $O(n)$ whenever $U = n^{O(1)}$.
 
 \RadixSort\ is constructed by using \SingletonBucketSort\ as a subroutine several times, but on a smaller universe size $b$.  Specifically, it turns each key from $[U]$ into an array of $k$ subkeys from $[b]$ using the algorithm \BC\ from Problem~\ref{prob:BC} above as a subroutine, and then iteratively sorts on each of the $k$ subkeys,
 Crucially, \RadixSort\ uses the fact that \SingletonBucketSort\ can be implemented in a way that is {\em stable} in the sense that it preserves the order in the input array when the same key appears multiple times.  Here is pseudocode for \RadixSort:
@@ -136,13 +212,80 @@ $k=\lceil \log_b U\rceil$\;
 (You can also read a description of Radix Sort in CLRS Section 8.3 for the case of sorting arrays of keys (without attached items) when $U$ and $b$ are powers of 2, albeit using different notation than us.)
 
         \begin{enumerate}
-        
-            \item (proving correctness of algorithms) Prove the correctness of \RadixSort\ (i.e. that it correctly solves the SortingOnFiniteUniverse problem defined in Lecture). 
+
+            \item (proving correctness of algorithms) Prove the correctness of \RadixSort\ (i.e. that it correctly solves the SortingOnFiniteUniverse problem defined in Lecture).
+
+            Hint: You will need to use the stability of \SingletonBucketSort in your argument. If it were replaced with an instable implementation (or any other unstable sorting algorithm, such as \ExhaustiveSearchSort\ with an unfortunate ordering on permutations), then the resulting algorithm would not be a correct sorting algorithm.   For intuition, you may want to think about what happens when you sort a spreadsheet by one column at a time.
             
-            Hint: You will need to use the stability of \SingletonBucketSort in your argument. If it were replaced with an instable implementation (or any other unstable sorting algorithm, such as \ExhaustiveSearchSort\ with an unfortunate ordering on permutations), then the resulting algorithm would not be a correct sorting algorithm.   For intuition, you may want to think about what happens when you sort a spreadsheet by one column at a time. 
+            \smallskip
+            \noindent\textbf{Answer.}
             
-            \item (analyzing runtime) Show that \RadixSort\ has runtime $O((n+b)\cdot \lceil \log_b U\rceil)$.  Set $b=\min\{n,U\}$ to obtain our desired runtime of $O(n+n\cdot (\log U)/(\log n))$.  (This runtime analysis is outlined in CLRS, but you'd need to adapt it to our notation and slightly more general setting.) 
-          
+            Claim. RadixSort solves the SortingOnFiniteUniverse problem.
+            
+            Let us prove the claim by strong induction on $l$, which we define to be the number of  iterations in line 5 that we've completed. We will show that the items in the array 
+            
+            $((K_0', (V_0, V'_0)), ..., (K'_{n-1}, (V_{n-1}, V'_{n-1})))$ will be sorted (by value) to at least the least significant $l$ digits of the original keys' base-b representation.
+            
+            \bigskip
+            
+            Lemma. $BC(K_i, b, k)$ is unique to the number $K_i$ and is not $\bot$.
+            
+            Since $BC$ converts $K_i$ into a number in base-b, the answer is unique if it isn't $\bot$. And since $k=\lceil log_bU\rceil$, and because any $K_i\in[U]$ fits into that many digits, we never return $\bot$. (Let's just assume that the $k=0$ case returns (0) instead of $\bot$, since that'd break the RadixSort algorithm).
+            
+            \bigskip
+            
+            Base Case. For $l_0=0$, it's trivial that at least 0 digits of the keys' base-b representation are sorted. Also, let's assume $U\neq 0$, or else the log on line 2 breaks.
+            
+            \bigskip
+            
+            Strong Inductive Hypothesis. For some arbitrary $l\in\N$, let us assume that at least $l$ digits of the keys' base-b representation are sorted.
+            
+            \bigskip
+            
+            Inductive Case. Assuming that the $l$ least significant base-b digits of the original keys are sorted, we will show that after the next iteration of the loop on line 5, at least $l+1$ digits will be sorted. Let's note here that $V_i$ never changes and $V'_i$ (the least-significant digit representation of the original keys in base-b) never changes after the loop in line 3, only being shuffled around. Now, the loop on line 6 will replace the to-be-sorted temporary keys with the $j$th least significant digit of $V'_i$. Since we've already gone through $l$ iterations of the line 5 loop, $j=l$ for this iteration -- and since $V'_i$ is 0-indexed, the temporary key $K'_i$ is the $l+1$th least significant digit after line 7. Then, line 8 sorts by that $l+1$th least significant digit. Because SingletonBucketSort is stable in our implementation, we know that though the new array is sorted by the $l+1$th least significant digit, within the repeated keys $\in[b]$ the keys retain the order they had during the last iteration -- that is to say, each repeated digit is sub-sorted by the $l$ least significant digits. So if the new array is sorted by the $l+1$th least significant and each of the repeats are sub-sorted by the preceding $l$ least significant, then our overall array is sorted by all $l+1$ least significant digits of the original keys, which we source from the unmodified $V'_i$ array; to be precise, we mean that the $(V_i, V'_i)$ pairs are currently in the spots that correspond to their correct spots had the keys of the temporary array been the base-b representations of the original $K_i$s.
+            
+            \bigskip
+            
+            Therefore, by strong induction, after any given iteration of the line 5 loop, at least that many digits in base-b are sorted. So it follows that after the loop terminates, which it must since $k$ is finite, the array $((K_0', (V_0, V'_0)), ..., (K'_{n-1}, (V_{n-1}, V'_{n-1})))$ is completely sorted by the base-b representation of the original $K_i$ stored in $V'_i$.
+            
+            Finally, we reconstruct said original keys by reversing the definition of base-b representation (inverse $BC$) so that every $V_i$ is now re-associated with its original key. Returning the reconstructed array contains all of its original values (only shuffled, not changed) sorted by their original keys. Therefore, the returned array is sorted and the algorithm solves the SortingOnFiniteUniverse problem.
+            
+            \bigskip
+
+            \item (analyzing runtime) Show that \RadixSort\ has runtime $O((n+b)\cdot \lceil \log_b U\rceil)$.  Set $b=\min\{n,U\}$ to obtain our desired runtime of $O(n+n\cdot (\log U)/(\log n))$.  (This runtime analysis is outlined in CLRS, but you'd need to adapt it to our notation and slightly more general setting.)
+            
+            \bigskip
+            
+            Let's calculate runtime by keeping a running total of the individual lines of RadixSort.
+            
+            Line 2 has a runtime of $O(1)$. Let's say logarithms don't scale with number size
+            
+            Line 3 is a loop that runs $n$ times.
+            
+            Line 4 calls $BC(K_i, b, k)$. $BC$ itself has a loop that runs $k$ times and each line in the loop is constant time (let's assume divisions and mod operations don't get more complex with larger numbers). This makes the loop $O(k)$ overall, and with a constant-time branch that just returns, $BC$ is $O(k)$ in total. And since line 4 assigns the answer to $V'_i$, that takes another constant number of operations, leaving line 4 at $O(k)$.
+            
+            So in total, lines 3 and 4 run for $n\cdot O(k)=O(n\cdot k)$.
+            
+            Line 5 is a loop that runs $k$ times.
+            
+            Line 6 is a loop that runs $n$ times.
+            
+            Line 7 is a constant-time copy. Since it's inside the two loops in lines 5 and 6, it runs for a total of $k\cdot n\cdot O(1)=O(k\cdot n)$.
+            
+            Line 8 calls $SingletonBucketSort$ on an array of size $n$ and a universe $b$, which we've established previously runs in $O(n+b)$ time. Afterwards, we overwrite/copy an array of $3n$ elements, so line 8's runtime is $O(n+b)+3n=O(4n+b)=O(n+b)$. But since it's inside the line 5 loop, it's overall runtime is $k\cdot O(n+b)=O((n+b)\cdot k)$.
+            
+            So lines 5-8 have a total runtime of $O(k\cdot n)+O((n+b)\cdot k)=O(k\cdot n + (n+b)\cdot k)=O((2n+b)\cdot k)=O((n+b)\cdot k)$.
+            
+            Line 9 is a loop that runs $n$ times.
+            
+            Line 10 has $k$ additions and $O(k)$ multiplications, assuming that we've either pre-calculated the $b$ exponents or that exponentiation takes constant time. This makes for a line 10 runtime of $O(k)+O(k)=O(k)$.
+            
+            So lines 9-10 have a total runtime of $n\cdot O(k)=O(n\cdot k)$.
+            
+            Line 11 is a return that copies $2n$ elements.
+            
+            So the total algorithm has a runtime of $O(1)+O(n\cdot k)+O((n+b)\cdot k)+O(n\cdot k)+2n=O((3n+b)\cdot k=O((n+b)\cdot k)$. Since $k=\lceil log_bU\rceil$, then the runtime is $O((n+b)\cdot\lceil log_bU\rceil)$. If $b=min\{n, U\}$, then the runtime is the maximum of $O((n+n)\cdot\lceil log_bU\rceil)=O(n\cdot\lceil log_bU\rceil)$ and $O((n+U)\cdot\lceil log_bU\rceil)$, which is the larger $O((n+U)\cdot\lceil log_bU\rceil)$.
+
         \end{enumerate}
 
 \item (Reflection Question)  There are a number of resources to support your learning in CS1200, such as Lecture, Ed, Office Hours, Sections, Hesterberg-Vadhan book, Recommended Readings, Collaboration with Classmates, Sender-Receiver Exercises.  Which of these (or any others that come to mind) have you found most helpful so far and why?  Are there ones that you should take more advantage of going forward?  Do you have suggestions for how the course can make these more helpful to you?
