@@ -1,0 +1,6 @@
+**/.vscode
+*.synctex*
+*.log
+*.out
+*.aux
+*.pdf
