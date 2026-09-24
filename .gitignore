@@ -4,3 +4,7 @@
 *.out
 *.aux
 *.pdf
+**/__pycache__
+**/.mypy_cache
+*.fdb_latexmk
+*.fls
