@@ -4,7 +4,7 @@ class BinarySearchTree:
     # key: int
     # item: int
     # size: int
-    def __init__(self, debugger = None):
+    def __init__(self, debugger=None):
         self.left = None
         self.right = None
         self.key = None
@@ -14,9 +14,9 @@ class BinarySearchTree:
 
     @property
     def size(self):
-         return self._size
-       
-     # a setter function
+        return self._size
+
+    # a setter function
     @size.setter
     def size(self, a):
         debugger = self.debugger
@@ -25,11 +25,12 @@ class BinarySearchTree:
         self._size = a
 
     ####### Part a #######
-    '''
+    """
     Calculates the size of the tree
     returns the size at a given node
-    '''
-    def calculate_sizes(self, debugger = None):
+    """
+
+    def calculate_sizes(self, debugger=None):
         # Debugging code
         # No need to modify
         # Provides counts
@@ -46,12 +47,13 @@ class BinarySearchTree:
             self.size += self.left.calculate_sizes(debugger)
         return self.size
 
-    '''
+    """
     Select the ind-th key in the tree
-    
+
     ind: a number between 0 and n-1 (the number of nodes/objects)
     returns BinarySearchTree/Node or None
-    '''
+    """
+
     def select(self, ind):
         left_size = 0
         if self.left is not None:
@@ -61,14 +63,16 @@ class BinarySearchTree:
         if left_size > ind and self.left is not None:
             return self.left.select(ind)
         if left_size < ind and self.right is not None:
-            return self.right.select(ind)
+            # Don't consider left subtree (left_size)
+            # Don't consider current node (1)
+            return self.right.select(ind - (left_size + 1))
         return None
 
-
-    '''
+    """
     Searches for a given key
     returns a pointer to the object with target key or None (Roughgarden)
-    '''
+    """
+
     def search(self, key):
         if self is None:
             return None
@@ -79,25 +83,45 @@ class BinarySearchTree:
         elif self.left is not None:
             return self.left.search(key)
         return None
-    
 
-    '''
+    """
     Inserts a key into the tree
-    key: the key for the new node; 
+    key: the key for the new node;
         ... this is NOT a BinarySearchTree/Node, the function creates one
-    
+
     returns the original (top level) tree - allows for easy chaining in tests
-    '''
+    """
+
     def insert(self, key):
         if self.key is None:
             self.key = key
-        elif self.key > key: 
+        elif self.key > key:
+            self.size += 1
             if self.left is None:
                 self.left = BinarySearchTree(self.debugger)
             self.left.insert(key)
         elif self.key < key:
+            self.size += 1
             if self.right is None:
                 self.right = BinarySearchTree(self.debugger)
             self.right.insert(key)
-        self.calculate_sizes()
         return self
+
+    def rotate_right(self, parent):
+        if self.left is None:
+            return None
+        newroot = self.left
+        self.left = self.left.right
+        newroot.right = self
+        newroot.size = self.size
+        self.size = (
+            1
+            + (0 if self.left is None else self.left.size)
+            + (0 if self.right is None else self.right.size)
+        )
+        if parent is not None:
+            if parent.left is self:
+                parent.left = newroot
+            else:
+                parent.right = newroot
+        return newroot
