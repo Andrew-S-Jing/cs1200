@@ -1,4 +1,5 @@
 \documentclass[11pt]{article}
+\newcounter{chapter}
 \usepackage{cs1200}
 \usepackage{graphicx}
 \usepackage{float}
@@ -18,13 +19,13 @@ All sources of ideas, including (but not restricted to) any collaborators, AI to
 If you did not have any collaborators or external resources, please write 'none.' 
 \newline
 
-\textbf{Your name: }
+\textbf{Your name: Andrew Jing}
 
-\textbf{Collaborators and External Resources:}
+\textbf{Collaborators and External Resources: Claude code turned my algorithm pseudocode, photos and python, into latex. Also reviewed my write-ups for grammar, latex typing mistakes, etc.}
 
-\textbf{No. of late days used on previous psets: }
+\textbf{No. of late days used on previous psets: 1}
 
-\textbf{No. of late days used after including this pset: }
+\textbf{No. of late days used after including this pset: 1}
 
 \vspace{1em}
 
@@ -52,9 +53,59 @@ If you did not have any collaborators or external resources, please write 'none.
             \item The area of a triangle is $A = \sqrt{s(s-a)(s-b)(s-c)}$ where $a, b, c$ are the side lengths of the triangle and $s = \frac{a + b + c}{2}$ (\href{https://en.wikipedia.org/wiki/Heron\%27s_formula}{Heron's Formula}).
         \end{itemize}
 
+        \begin{mysolution}
+        \SetKwFunction{PolarSortArea}{PolarSortArea}
+        \SetKwFunction{SortingOracle}{SortingOracle}
+        \SetKwFunction{PolarConvert}{PolarConvert}
+
+        \begin{algorithm}[H]
+        \nonl \PolarSortArea{$((x_0,y_0),\ldots,(x_{n-1},y_{n-1}))$}\\
+        \Input{Points $(x_0,y_0),\ldots,(x_{n-1},y_{n-1})$, the vertices of a convex polygon containing $(1,1)$ in its interior (so each $(x_i,y_i)\neq(1,1)$)}
+        \Output{The area of the polygon}
+        \ForEach{$i\in[n]$}{
+            $(r_i,\theta_i) = \PolarConvert((x_i,y_i))$\;
+        }
+        $((\theta'_0,(r'_0,x'_0,y'_0)),\ldots,(\theta'_{n-1},(r'_{n-1},x'_{n-1},y'_{n-1}))) = \SortingOracle(((\theta_0,(r_0,x_0,y_0)),\ldots,(\theta_{n-1},(r_{n-1},x_{n-1},y_{n-1}))))$\;
+        $\mathit{sum} = 0$\;
+        \ForEach{$i=1,\ldots,n-1$}{
+            $a = \sqrt{(x'_{i-1}-x'_i)^2+(y'_{i-1}-y'_i)^2}$\;
+            $s = \frac{1}{2}(a+r'_{i-1}+r'_i)$\;
+            $\mathit{sum} = \mathit{sum} + \sqrt{s(s-a)(s-r'_{i-1})(s-r'_i)}$\;
+        }
+        $a = \sqrt{(x'_0-x'_{n-1})^2+(y'_0-y'_{n-1})^2}$\;
+        $s = \frac{1}{2}(a+r'_0+r'_{n-1})$\;
+        $\mathit{sum} = \mathit{sum} + \sqrt{s(s-a)(s-r'_0)(s-r'_{n-1})}$\;
+        \Return{$\mathit{sum}$}
+        \caption{PolarSortArea}
+        \end{algorithm}
+        
+        \qquad As an overview of what the algorithm does, it (1) sorts all points by polar angle from $(1,1)$ and (2) calculates the area of the triangle formed by $(1,1)$ and each pair of neighboring vertices, and (3) adds those triangles' areas for the total.
+        
+        \smallskip
+        
+        \qquad The algorithm is correct because in a convex polygon, triangles made by a fixed interior point and two neighboring vertices on the polygon never overlap, but all of them together cover the entire convex polygon, so the sum of the triangles' areas is exactly the area of the entire convex polygon. We can find pairs of neighboring vertices by sorting their polar angle relative to the interior point, and we know that this sorted vector has no duplicate keys (angles). This is because (1) no vertex can be $(1,1)$ since that point is interior, so each vertex has only 1 valid $\theta$, (2) each vertex is unique or else the sides between repeated vertices would be length 0 and cannot be part of the convex polygon (or if we allow dupes they only add triangles of area 0 anyway), and (3) two distinct vertices with the same $\theta$ to an interior point cannot be a part of a convex polygon, since the polygon's outline would need to bend outwards to keep $(1,1)$ inside. So all $\theta_i$ are distinct, and we know that in the sorted array two neighboring entries (or the first and last entries, whose side straddles $\theta=0$) form pairs of neighboring vertices, or else we would break convexity. So for each neighboring pair, the triangle it forms with $(1,1)$ has two sides that by definition are the polar radius from $(1,1)$ and we calculate the remaining side opposite $(1,1)$ by keeping non-polar coordinates together with their polar representations. Also, there are at least 3 points in a polygon, so neither the loop nor non-loop area calculations get skipped. Since this method retains all sorted points as a permutation of the original input, and because these partial triangles add to exactly the full polygon, the accumulated $sum$ across the partial triangles' areas are indeed the correct answer.
+        
+        \bigskip
+        
+        \qquad Let's look at runtime. The line 1 loop is $n$ iterations times a constant-time conversion for $O(n)$. Constructing the input for $SortingOracle$ is $O(n)$ copies, while the oracle itself is 1 step. Initializing $sum$ is one step. Looking at lines 5-11 as one loop, we perform $n$ iterations of the same set of math operations for a total of $O(n)$ time (assuming these operations are constant relative to number magnitude). Then, the  return statement is also 1 step. In total, we have an algorithm that reduces to Sorting in $O(n)+O(n)+1+1+O(n)+1=O(n)$ time. Also, we call $SortingOracle$ exactly once, with $n$ entries to sort. So AreaOfConvexPolygon$\leq_{O(n),n}$ Sorting (more specifically AreaOfConvexPolygon$\leq_{O(n),1\otimes n}$ Sorting).
+        \end{mysolution}
+
+
         \item Deduce that AreaOfConvexPolygon can be solved in time $O(n\log n)$. \textit{Maximum 4-5 sentences}
 
+        \begin{mysolution}
+        	Since AreaOfConvexPolygon$\leq_{O(n),1\otimes n}$ Sorting, and because $MergeSort$ solves Sorting in $O(n \log n)$, then we know it's possible to solve AreaOfConvexPolygon in $O(n)+O(1\cdot O(n \log n))=O(n+n \log n)=O(n \log n)$. (See Lemma 4.3 and 4.4).
+        \end{mysolution}
+
+
         \item (*challenge; extra credit; optional\footnote{This problem is meant to be done based on your enjoyment/interest and only if you have time. It won't make a difference between N, L, R-, and R grades (meaning it will only impact whether an R gets increased to an R+), and course staff will deprioritize questions about this problem at office hours and on Ed.})  Come up with a way to avoid conversion to polar coordinates and any other trigonometric functions in solving AreaOfConvexPolygon in time $O(n\log n)$.  Specifically, design an $O(n)$-time reduction that makes $O(1)$ calls to a Sorting oracle on arrays of length at most $n$, using only arithmetic operations $+$, $-$, $\times$, $\div$, and $\sqrt{\hspace{1em}}$, along with comparators like $<$ and $==$.  (Hint: first partition the input points according to which quadrant they belong in, and consider the slope of the line from a vertex (x,y) to the origin.) \label{part:nopolar}
+
+    \begin{mysolution}
+    	\qquad Instead of converting to polar, we can split the points into 4 sub-groups, one for each quadrant relative to $(1,1)$ (let's say the upper right and bottom left quadrants own the axes relative to $(1,1)$). Let's sort (with $SortingOracle$) each of the 4 quadrants by the slope of the lines between each vertex and $(1,1)$, defining vertical slopes as $\infty$ (or just place them at the end of the sorted subgroups). By the same logic as with polar conversion, within these quadrants, the vertices' slopes are unique. Then concatenate the subgroups in counter-clockwise order, and follow a similar area calculation scheme as in 1a (shifting the radius calculation to this step instead of earlier during conversion). By similar logic as 1a, this non-trigonometric algorithm is correct, with these necessary addendums: the first point in a non-empty sorted quadrant is a neighboring vertex to the last point in the closest (clockwise) non-empty sorted quadrant (and the opposite for the last point in each non-empty quadrant), so the total, concatenated array with 4 sorted subgroups will still guarantee that each neighbor pair by sorting is also a neighbor pair as vertices (and also entries 0 and $n-1$).
+    	
+    	\qquad Since each quadrant (relative to $(1,1)$) can't have more points than the entire polygon does, each of the 4 calls to $SortingOracle$ is performed on a subgroup of at most $n$ entries. And the reduction algorithm itself performs $O(n)$ steps for slope calculations, $O(n)$ setup of the oracle calls' input arrays, $O(n)$ for concatenation, and $O(n)$ for calculating $n$ partial triangles' areas and adding them together. Plus some other $O(1)$ stuff like returning. So in total AreaOfConvexPolygon$\leq_{O(n),4\otimes n}$ Sorting, which by similar logic to 1b proves there's a way to solve AreaOfConvexPolygon in $O(n \log n)$. However, since our reduction doesn't use trigonometry, and a witness $MergeSort$ to the sorting oracle also doesn't use trigonometry, we know that this solving in $O(n \log n)$ can happen without trigonometry, either.
+    \end{mysolution}
+
 
     \end{enumerate}
     
@@ -66,6 +117,15 @@ If you did not have any collaborators or external resources, please write 'none.
     Let $\Pi, \Gamma, \Lambda$ be computational problems, and suppose that $\Pi\leq_{T_1(n),q_1(n)\otimes h_1(n)} \Gamma$ and \\ $\Gamma \leq_{T_2(n),q_2(n)\otimes h_2(n)} \Lambda$, for non-decreasing functions $T_1,T_2,q_1,q_2,h_1,h_2$.  Determine functions $T_3,q_3,h_3$ in terms of $T_1,T_2,q_1,q_2,h_1,h_2$ such that 
     $$\Pi \leq_{O(T_3(n)),q_3(n)\otimes h_3(n)} \Lambda,$$
     and justify your answers. You do not need to prove the correctness of the reduction from $\Pi$ to $\Lambda$. Just justify the functions $T_3$, $q_3$ and $h_3$. You don't need to give a formal proof, \textit{around half a page answer} (Hint: you can take $h_3(n)=h_2(h_1(n))$.) 
+
+    \begin{mysolution}
+    	\qquad The reduction from $\Pi$ to $\Gamma$ calls a $\Gamma$ oracle at most $q_1(n)$ times, and if we take the reduction from $\Gamma$ to $\Lambda$ as a partial witness to that $\Gamma$ oracle (which itself calls a $\Lambda$ oracle at most $q_2(m)$ times each of its $q_1(n)$ instances), then since $m\leq h_1(n)$ and $q_2$ is non-decreasing the maximum time our reduction from $\Pi$ to $\Lambda$ must call the $\Lambda$ oracle at most $q_3(n)=q_1(n)\cdot q_2(h_1(n))$ times.
+    	
+    	\qquad Since each $\Gamma$ oracle has an input of $m\leq h_1(n)$, and since the reduction from $\Gamma$ to $\Lambda$ calls the $\Lambda$ oracle with an input of $p\leq h_2(m)$, because $h_2$ is non-decreasing then we know $p\leq h_2(m)\leq h_2(h_1(n))$, so $h_3(n)=h_2(h_1(n))$.
+    	
+    	\qquad Since the $\Gamma$ to $\Lambda$ reduction (as partial witness to the oracle) is called at most $q_1(n)$ times with max input size $h_1(n)$, because its runtime is $O(T_2(m))$ where $m\leq h_1(n)$, since $T_2$ is non-decreasing we know that the total witness runtime (still abstracting the $\Lambda$ oracle) is at most $q_1(n)\cdot O(T_2(h_1(n)))$. So, accounting for the non-oracle runtime in the reduction from $\Pi$ to $\Gamma$, the total composite reduction's runtime is $T_3=T_1(n)+q_1(n)\cdot T_2(h_1(n))$. We got rid of the big $O$ in $T_3$ since it was moved outside of $T_3$ for total runtime.
+    \end{mysolution}
+
 
     \newpage
 
@@ -81,9 +141,51 @@ If you did not have any collaborators or external resources, please write 'none.
         \item In the Github repository, we have given you a Python implementation of size-augmented BSTs supporting search, insertion, and selection, and with a stub for \texttt{rotate}. One of the implemented functions (\texttt{search}, \texttt{insert}, or \texttt{select}) has a correctness error, another one is too slow (running in time that's (at least) linear in the number of nodes of the tree rather than linear in the height of tree), and the third is correct. 
         Identify and correct these errors. You should provide a text explanation of the errors and your corrections, as well as implement the corrections in Python.    
 
+        \begin{mysolution}
+        	\qquad The \texttt{select} function is wrong, because when it prunes the left subtree (and current node) from consideration, it doesn't change what rank to look for in the next recursive step. For the answer to be correct, the $ind$ variable needs to be shifted by however many candidates we dropped -- so the correction is \texttt{return self.right.select(ind - (left\_size + 1))}. This balances out how many candidates we drop with what rank we're saying to look for.
+        	
+        	\qquad The \texttt{insert} function takes too long, since it calls \texttt{calculate\_sizes}, which is $O(n)$ instead of $O(h)$.  Instead, we only have to recalculate the sizes that were affected by the insert, which is the chain of all ancestors of the new node. So we can just increment the sizes of all nodes we visit (except the inserted node, which already starts at size 1) and not call \texttt{calculate\_sizes}.
+        	
+        	\qquad \texttt{search} is fine.
+        \end{mysolution}
+
+
         \item 
         
         Describe (in pseudocode or pictures) how to extend \texttt{rotate} to size-augmented BSTs, and argue that your extension maintains the runtime $O(1)$. Explain the intuition \textit{in 2-3 sentences} that your new rotation operation preserves the invariant of correct size-augmentations. (That is, if every node's size attribute had the correct subtree size before the operation, then the same is true after the operation.)
+
+        \begin{mysolution}
+        \SetKwFunction{RotateRight}{RotateRight}
+        \begin{algorithm}[H]
+        \nonl \RotateRight{$y, p$}\\
+        \Input{A node $y$ of a size-augmented BST, and its parent $p$ (\texttt{None} if $y$ is the root)}
+        \Output{The new root $x$ of the rotated subtree (\texttt{None} if $y$ has no left child)}
+        \If{$y.\mathit{left} = \texttt{None}$}{
+            \Return{\texttt{None}}
+        }
+        $x = y.\mathit{left}$\;
+        $y.\mathit{left} = x.\mathit{right}$\;
+        $x.\mathit{right} = y$\;
+        $x.\mathit{size} = y.\mathit{size}$ \tcc*{$x$ now roots exactly the nodes $y$ used to}
+        $y.\mathit{size} = 1 + \mathit{size}(y.\mathit{left}) + \mathit{size}(y.\mathit{right})$ \tcc*{$\mathit{size}(\texttt{None}) = 0$}
+        \If{$p \neq \texttt{None}$}{
+            \eIf{$p.\mathit{left} = y$}{
+                $p.\mathit{left} = x$\;
+            }{
+                $p.\mathit{right} = x$\;
+            }
+        }
+        \Return{$x$}
+        \caption{RotateRight}
+        \end{algorithm}
+
+        	The algorithm and justification for a left rotate is symmetrical.
+        	
+        	Since subtree size is defined as $1+size(left)+size(right)$, if we modify a tree, a subtree's size only changes if its own subtrees were changed. Since the algorithm never touches the original \texttt{y.right}, \texttt{x.left}, and \texttt{x.right} subtrees, those sizes carry over from before the rotate. Only two nodes' subtrees actually change: the original root and its left child, so we calculate the original root's new size by definition, and since its former left child is now the root, we just set it to the old tree size because we haven't inserted or deleted anything.
+        	
+        	The runtime is $O(1)$ because we only change pointers, not where the nodes are located, and at maximum we do several assigns, a couple compares, and 2 additions before returning.
+        \end{mysolution}
+
 
         \newenvironment{tmpSol}{%
            \setlength{\parindent}{0pt}
@@ -95,6 +197,11 @@ If you did not have any collaborators or external resources, please write 'none.
     \emph{Food for thought (do read - it's an important take-away from this problem):} This problem concerns size-augmented binary search trees. In lecture, we discussed AVL trees, which are balanced binary search trees where every vertex contains an additional \textit{height} attribute containing the length of the longest path from the vertex to a leaf (height-augmented). Additionally, every pair of siblings in the tree have heights differing by at most 1, so the tree is height-balanced. Note that if we augment a binary search tree both by size (as in the above problem) and by height (and use it to maintain the AVL property), then we create a dynamic data structure able to perform \texttt{search}, \texttt{insert}, and \texttt{select} all in time $O(\log n)$. 
 
 \item (reflection) We aim for cs1200 to be a collaborative learning community. Describe two concrete ways in which you have supported, or will try to support, your classmates' learning in the course.  Be specific, connecting your answer to the structure of cs1200. 
+
+\begin{mysolution}
+	During lecture we often have group activities/breakout discussions. In those moments I try to ask my tablemates what they think and attempt to have all of us participate in the discussion. Of course, I don't force the point if they don't want to talk. I find this approach to be more chill than everyone doing stuff independently or one person solves and other people listen/look. This applies to CS1200 specifically because it can be jarring to switch from listening to a lecture to remembering to talk, without someone breaking the silence. Also, I'll keep trying to collaborate with classmates to compare approaches to pset problems. The main barrier to this is how busy we all are, but for CS1200 it's probably more important than for other classes, since there can be so many different approaches to one proof.
+\end{mysolution}
+
 
 Quick note on grading: Good responses are usually about a paragraph, with something like 7 or 8 sentences. Most importantly, please make sure your answer is specific to this class and your experiences in it. If your answer could have been edited lightly to apply to another class at Harvard, points will be taken off.
 

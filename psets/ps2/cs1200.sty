@@ -1,4 +1,4 @@
-\usepackage{Fall26/IntroAlgorithmsAndLimitations}
+\usepackage{IntroAlgorithmsAndLimitations}
 \harvardtrue
 \usepackage{chngcntr}
 \counterwithin{theorem}{section}
@@ -153,7 +153,7 @@
 \vspace*{4mm}}
 
 
-\newcommand\makeemptybox[1]{
+\renewcommand\makeemptybox[1]{
   \par
   \begingroup
     \setlength{\fboxsep}{0pt}%
@@ -213,4 +213,4 @@
 %Draft comment features
 \newif\ifdraft
 \drafttrue
-\newcommand{\vihaan}[1]{\ifdraft{\todo[inline,color=blue!20!white]{\textbf{Vihaan:} #1}}\fi}
+\renewcommand{\vihaan}[1]{\ifdraft{\todo[inline,color=blue!20!white]{\textbf{Vihaan:} #1}}\fi}
