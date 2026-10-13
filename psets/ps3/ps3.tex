@@ -115,7 +115,7 @@ For privacy reasons, the Bureau decides to not publish any statistics on the pop
 \begin{enumerate}[label=(\roman*)]
     \item \solRec This should be a hash map because we don't have to sort anything and want quick (expected) lookups and updates.
     \item \solUse The hash map should have keys $\id$ and values $\bday$. Its number of hash buckets $m$ depends on the Bureau's desired storage-to-speed tradeoff, but $m$ should be linearly proportional to the current total size of the hash map so let's say max load factor is 1 and we start with $m=2n$. Updating means inserting $(\id, \bday)$ or deleting $\id$. Again, without a stated policy we must assume that each to-be-deleted tuple has a matching one in the database, and that each $\id$ has at most one entry.
-    \item \solTime I'm pretty sure SSN is assigned deterministically relative to when and where someone registers for one (which btw means someone can make targeted guesses about your SSN if they know your birth hospital and date+time, yet another reason why SSN-based verification is terrible), but let's pretend we have a hashing function that we expect to spread $\id$ evenly across buckets. That means a preprocessing costs $O(m)+n\cdot O(1)=O(n)$ for storage reservation and $n$ hashes+stores, and we bound daily updates to $u\cdot O(1)=O(u)$ expected runtime. This retains lookup support with expected runtime of $O(1+1)=O(1)$ since  our max load factor is 1.
+    \item \solTime That means a preprocessing costs $O(m)+n\cdot O(1)=O(n)$ for storage reservation and $n$ hashes+stores, and we bound daily updates to $u\cdot O(1)=O(u)$ expected runtime. This retains lookup support with expected runtime of $O(1+1)=O(1)$ since  our max load factor is 1.
 \end{enumerate}
 \end{soln}
 
