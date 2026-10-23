@@ -4,6 +4,13 @@
 \usepackage{graphicx}
 \usepackage{float}
 
+% Solution blocks (always displayed, set in blue so they stand out from the prompt)
+\newenvironment{soln}{%
+  \par\medskip\noindent\begingroup\color{blue}\textbf{Solution.}\ %
+}{%
+  \endgroup\par\medskip%
+}
+
 \begin{document}
 
 \psHeader{4}{Mon Oct. 19, 2026 (11:59pm)}
@@ -14,13 +21,13 @@ All sources of ideas, including (but not restricted to) any collaborators, AI to
 
 If you did not have any collaborators or external resources, please write 'none.' A problem set on the border between two letter grades cannot be rounded up if collaborators are not noted.
 
-\textbf{Your name: }
+\textbf{Your name: Andrew Jing}
 
-\textbf{Collaborators and External Resources:}
+\textbf{Collaborators and External Resources: Claude Code made a format for my solutions to fit in the LaTeX file}
 
-\textbf{No. of late days used on previous psets: }
+\textbf{No. of late days used on previous psets: 1}
 
-\textbf{No. of late days used after including this pset: }
+\textbf{No. of late days used after including this pset: 1}
 
 \vspace{1em}
 The purpose of this problem set is to solidify your understanding of the RAM model (and variants), and the relations between the RAM model, the Word-RAM model, Python programs, and variants. In particular, you will build skills in simulating one computational model by another and in evaluating the runtime of the simulations (both in theory and in practice).
@@ -30,6 +37,10 @@ The purpose of this problem set is to solidify your understanding of the RAM mod
     \item (Simulation in practice: RAMs on Python)
     In the Github repository, we have given you a partially written Python implementation of a universal RAM Model simulator.  Your task is to fill in the missing parts of the code to obtain a complete universal RAM simulator.
      Your simulator should take as input a RAM Program $P$ and an input $x$, and simulate the execution of $P$ on $x$, and return whatever output $P$ produces (if it halts).  The RAM Program $P$ is given as a Python list $[v,C_0,C_1,\ldots,C_{\ell-1}]$, where $v$ is the number of variables used by $P$.  For simplicity, we assume that the variables are named $0,\ldots,v-1$ (rather than having names like ``tmpptr'' and ``insertvalue''), but you can introduce constants to give names to the variables.  The $0$\textsuperscript{th} variable will always be $\inputlen$, the $1$\textsuperscript{st} variable $\outputpointer$, and the $2$\textsuperscript{nd} variable $\outputlen$.  A command $C$ is given in the form of a list of the form $[\cmd]$, $[\cmd,i]$, $[\cmd,i,j]$, or $[\cmd,i,j,k]$, where $\cmd$ is the name of the command and $i,j,k$ are the indices of the variables or line numbers used in the command.  For example,  the command $\var_i = M[\var_j]$ would be represented as $(\READ,i,j)$.  See the Github repository for the precise syntax as well as some RAM programs you can use to test your simulator.
+
+\begin{soln}
+See code.
+\end{soln}
      
 \item (Empirically evaluating simulation runtimes and explaining them theoretically)  
 
@@ -90,12 +101,41 @@ $M[\outputpointer]=\result$\;
 \begin{enumerate}
     \item Exactly calculate (without asymptotic notation) the RAM-model running times of the above algorithms as a function of $N$.
     Which one is faster? (\textit{4-7 sentences}) \label{itm:RAMtime} 
+
+\begin{soln}
+The first one: Lines 0-6, 11-12 run exactly once for 9 steps, and line 7 runs 1 extra time when the loop exits, for a total constant 10 steps. The loop itself runs has 4 lines that run fully $N$ times, so the total runtime is $4N+10$.
+
+The second one: Lines 0-7, 15-19 run once and line 8 one extra time for 14 steps. The loop is 7 steps long and runs $N$ times. The total runtime is $7N+14$.
+
+The first algorithm is faster by $3N+4$ for natural numbers, but these algorithms don't do the same thing.
+\end{soln}
     
     \item Using your RAM Simulator, run both RAM programs on inputs $N=0,1,2,\ldots,15$ and graph the actual running times (in clock time, not RAM steps).  (We have provided you with some timing and graphing code in the Github repository.) Which one is faster?  \label{itm:realtime} (\textit{1-2 sentences})
 
+\begin{soln}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.8\textwidth]{running_times.png}
+    \caption{Clock-time runtimes of both RAM programs for $N=0,\ldots,15$.}
+    \label{fig:runtimes}
+\end{figure}
+
+For smaller $N$ Program 1 is faster, but Program 2 is faster for larger $N$. This is because my PC doesn't have infinitely wide registers and the 32-bit mod helps multiplications take place in one step rather than relying on Python's integer abstractions.
+
+\end{soln}
+
     \item \textit{In no more than 10 sentences}, explain the discrepancies you see between Parts~\ref{itm:RAMtime} and \ref{itm:realtime}.  (Hint: What do we know about the relationship between the RAM and Word-RAM models, and why is it relevant to how efficiently the Python simulation runs?) 
 
+\begin{soln}
+In part 2a, we see that under the RAM model Program 1 is always faster by $3N+4$ steps. However, the Python model of computation is translated to a Word-RAM-like model of computation on actual hardware. This means that Python pays the translation costs associated with Word-RAM, and as $14^{2^N+1}$ gets larger and larger, the cost for simulating RAM computation grows. So multiplication of two large numbers are constant cost for the RAM model, but Python must take many steps to do that computation in some sort of bignum (not clamping like actual Word-RAM). Specifically, Program 2's 32-bit modulo limits the operands of multiplication such that the operation has a constant upper bound -- specifically the product will be guaranteed to fit in my x86-64 registers in one step. So the simulation cost vastly outstrips theoretical savings and leads to the difference between 2a and 2b.
+\end{soln}
+
     \item (optional\footnote{This problem won't make a difference between N, L, R-, and R grades.}) Give a theoretical explanation of the shapes of the runtime curves you see in Part~\ref{itm:realtime}, by providing explicit formulas for the asymptotic runtimes of the two programs (in clock time). You may need to do some research online and/or make guesses about how Python operations are implemented to come up with your estimates. 
+
+\begin{soln}
+Program 2 runs in the same number of steps in RAM and 64-bit Python models of computation (given $N$ is a valid number less than $2^64$), since multiplications won't require bignum computation. That means that Program 2 is an actual $O(N)$ algorithm in clock time. For Program 1, Python must fall back to bignum algorithms for multiplication that takes $O(N)$ space to store the result variable in memory rather than just registers. Also, multiplication will dominate runtime, and it seems that Python uses an adaptive algorithm that is either $O(n^2)$ or $O(n^{log_23})$ depending on how many digits $n$ the number is. Since the multiplication is called in the loop on numbers bounded by $14^{2^N+1}$, each multiplication takes $O((log 14^{2^N+1})^{log_23})=O((log_23\cdot 2)^N)$ and the whole program is $O((log_23\cdot 2)^N)$ because the $N$ factor of the loop is dominated by the multiplication.
+\end{soln}
 
 \end{enumerate}
 
@@ -111,11 +151,32 @@ Your proof should use an {\em implementation-level} description, similar to the 
 
 Recall that Word-RAM programs have a finite but changing memory size $S$; you may want to start your simulation by initializing $S$. Then think about how each operation of a Word-RAM program $P$ can be simulated in a RAM program $R$, taking care of any differences between their semantics in the Word-RAM model vs. the RAM model. Don't forget MALLOC!
 
+\begin{soln}
+We simulate Word-RAM on RAM by manually copying the behavior or Word-RAM. At startup, the three extra inputs are in the first memory slots, and $x$ is in the next $n$ memory addresses. All memory access addresses will be copied to a variable first and incremented by 3 before executed (reserve a variable for the literal 3). $S$ begins with the value $n+3$.
+
+For crashes, we immediately crash if the max input is $\geq2^w$. Comparison is achieved by seeing if a subtraction results in 0 (reserve a variable for the literal 0). We indicate a crash after the comparison by jumping to a command block that assigns $2^w$ to output pointer and length and then halting. Similarly, we will do the same thing for all integer literals used in assignment or gotos. For malloc, we can test if $S\geq 2^w+1+3$ (accounting for the 3 extra inputs) after each call, "crashing" when necessary. 
+
+For additions and multiplications, we do the $\geq$ check and clamp to $2^w-1$ if needed by assigning it to the result variable manually.
+
+After each command that was present in the original Word-RAM program, we can have a runtime counter (reserved variable initialized to 0) that increments itself and compares to $t$, halting in the same fashion as crashing. This variable alone could be unbound, because the runtime doesn't actually exist in a Word-RAM register, but the problem description seems to suggest we should crash when the counter hits $2^w$ anyways because of bitlength.
+
+After all this, we adjust jump instructions to reflect their original intent after the lines we added.
+
+This series of changes preserves the functionality of Word-RAM and replicates its behavior, since the individual operations are translated independently and faithfully. All crash and hang conditions are handled as specified, and the translation preserves halting return values in the RAM model. Because at every Word-RAM step, a constant amount of translation steps are taken, the translation cost is $O(1)$ per Word-RAM steps, and since we halt after the runtime counter reaches $t$ (equal to the number of Word-RAM steps), our total runtime for R is $O(t)$. Also, because the translation steps never call malloc, the largest number of malloc calls is bound by the number of Word-RAM steps taken $t$, so that $S$ grows by at most $t$, for a total of $n+t+3$ that bounds R's memory accesses. And because we bound our values to $2^w$ at every Word-RAM step, the widest a bitlength can get is by multiplying a maximum-value integer by another, which has at most bitlength $2w=O(w)$.
+
+Thus, all of the requirements for this translation are fulfilled, proving by implementation that R exists.
+
+\end{soln}
+
 \item (reflection) Discuss the value (or lack thereof) that you think computational models, and the RAM and Word-RAM models in particular, have for computer science.  All opinions are valid, as long as they show serious thought and are backed by specific justifications.
 
 Quick note on grading: Good responses are usually about a paragraph, with something like 7 or 8 sentences. Most importantly, please make sure your answer is specific to this class and your experiences in it. If your answer could have been edited lightly to apply to another class at Harvard, points will be taken off.
 
 \textit{Note: As with the previous psets, you may include your answer in your PDF submission, but the answer should ultimately go into a separate Gradescope submission form.}
+
+\begin{soln}
+The RAM and Word-RAM models of computation are a strange middle ground between abstract theory and practical theory. I like the freedom that arbitrarily powerful models of computation provide to computer scientists, but these ones in particular seem to take on half-baked limitations. For example, why would value clamping exist in a model but overflow doesn't? Why define a binary bitwidth limit when you could just cap numbers at $n_{max}$? If these limitations are included in the models for realism, then we should at least make them accurate. Otherwise, they come across as tedious and abstract while still not reflecting hardware. For example, we have a very specific need to define $S$ and memory layout for inputs and outputs, but instructions get a pocket dimension to live in.
+\end{soln}
 
 \item Once you're done with this problem set, please fill out \href{https://forms.gle/ZiNMNQ9nosYKTBBR7}{this survey} so that we can gather students' thoughts on the problem set, and the class in general. It's not required, but we really appreciate all responses!
 
