@@ -1,8 +1,17 @@
 \documentclass[11pt]{article}
+\newcounter{chapter}
 \usepackage{cs1200}
 \usepackage{IntroAlgorithmsAndLimitations}
 
 \usepackage[normalem]{ulem}
+\usepackage{xcolor}
+
+% Solution blocks (always displayed, set in blue so they stand out from the prompt)
+\newenvironment{soln}{%
+  \par\medskip\noindent\begingroup\color{blue}\textbf{Solution.}\ %
+}{%
+  \endgroup\par\medskip%
+}
 
 \begin{document}
 
@@ -19,11 +28,11 @@ If you did not have any collaborators or external resources, please write 'none.
 
 \vspace{1em}
 
-\textbf{Your name: }
+\textbf{Your name: Andrew Jing}
 
-\textbf{Collaborators and External Resources:}
+\textbf{Collaborators and External Resources: Claude formatted and made solution sections.}
 
-\textbf{No. of late days used on previous psets: }
+\textbf{No. of late days used on previous psets: 3}
 
 \textbf{No. of late days used after including this pset: }
 
@@ -37,11 +46,23 @@ If you did not have any collaborators or external resources, please write 'none.
         \item 
         Consider the computational problem $\Pi = (\Inputs,\Outputs,f)$ where $\Inputs=\Outputs=\N$ and $f(x)=\N$ for all $x\in \N$.  Show that $\Pi\in \Psearch$ but $\Pi\notin \NPsearch$.  Thus, $\Psearch\nsubseteq\NPsearch$. \textit{Around 7-8 sentences}
 
+\begin{soln}
+
+\end{soln}
+
 \item  Choose any computational problem you have studied in CS1200 which is in $\Psearch$. Explain why the same problem is in $\NPsearch$, and why the argument of the above nature does not apply to it. \textit{Around 6-8 sentences}
+
+\begin{soln}
+
+\end{soln}
 
 \end{enumerate}
 
 \item OpenAI recently \href{https://openai.com/index/building-scientific-understanding-with-academic-communities/}{claimed} that $\ThreeSAT$ on $n$ variables can be solved in runtime $O(n^c) \cdot 2^{O(n/(\log n)^{1/2})}$, for constant $c$. Assume their claim is true. It is known that $\IndependentSet$ on a graph with $n$ vertices and $m$ edges can be reduced to $\ThreeSAT$ with $n$ variables in polynomial time and $\LongestPath(k)$ on a graph with $n$ vertices and $m$ edges can be reduced to $\ThreeSAT$ with $nk$ variables. For which of $\IndependentSet$ and $\LongestPath$ do you obtain an algorithm with runtime $2^{o(n)}$, where $o(n)$ is small-oh of $n$? (Note: $\LongestPath(k)$ also includes the case where $k=\omega(1)$). \textit{Max one page}
+
+\begin{soln}
+
+\end{soln}
 
 \item ($\NPsearch$-completeness) Consider the following variant of $k$-SAT.
 
@@ -53,12 +74,20 @@ If you did not have any collaborators or external resources, please write 'none.
 
 Prove that \FlipFourSAT\ is $\NPsearch$-complete by reduction from \ThreeSAT.  \textit{Max one page}
 
+\begin{soln}
+
+\end{soln}
+
 \item (Factoring if $\NPsearch\subset \Psearch$) Every time your browser or one of your apps makes a secure connection to a website or server, it uses cryptography to make sure that eavesdroppers to the network cannot decipher the information you are transmitting. Factoring a large number is an important part of cryptography, and the basis for the RSA encryption. Lets define the computational problem formally.
 \compprob{\Factoring}
         {A natural number $N$ in base 2}
         {Two natural numbers $P,Q$ in base 2, such that $PQ=N$ (if exists)}
 
 Show that if $\NPsearch\subset \Psearch$, then there is an algorithm to solve \Factoring in time $O((\log N)^c)$, for some $c=O(1)$. Be careful about the length of input in base 2. \textit{(around 1/2 page)}
+
+\begin{soln}
+
+\end{soln}
 
 \textit{(Fun Fact: A remarkable property of quantum computers is that they can solve \Factoring in polynomial time, via Shor's algorithm. This does not mean that quantum computers can solve any problem in $\NPsearch$ in polynomial time, as \Factoring is not believed to be $\NPsearch$-complete).
 }\\
@@ -68,6 +97,10 @@ Show that if $\NPsearch\subset \Psearch$, then there is an algorithm to solve \F
 Quick note on grading: Good responses are usually about a paragraph, with something like 7 or 8 sentences. Most importantly, please make sure your answer is specific to this class and your experiences in it. If your answer could have been edited lightly to apply to another class at Harvard, points will be taken off.
 
 \textit{Note: As with the previous psets, you may include your answer in your PDF submission, but the answer should ultimately go into a separate Gradescope submission form.}
+
+\begin{soln}
+
+\end{soln}
 
 \item Once you're done with this problem set, please fill out \href{https://forms.gle/b2yJAorxffJSueVd6}{this survey} so that we can gather students' thoughts on the problem set, and the class in general. It's not required, but we really appreciate all responses!
 
