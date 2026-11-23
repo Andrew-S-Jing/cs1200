@@ -30,11 +30,11 @@ If you did not have any collaborators or external resources, please write 'none.
 
 \textbf{Your name: Andrew Jing}
 
-\textbf{Collaborators and External Resources: Claude formatted and made solution sections.}
+\textbf{Collaborators and External Resources: Claude formatted and made solution sections. It also checked my math notation for runtime analysis.}
 
 \textbf{No. of late days used on previous psets: 3}
 
-\textbf{No. of late days used after including this pset: }
+\textbf{No. of late days used after including this pset: 3}
 
 \vspace{0.2in}
 
@@ -47,13 +47,13 @@ If you did not have any collaborators or external resources, please write 'none.
         Consider the computational problem $\Pi = (\Inputs,\Outputs,f)$ where $\Inputs=\Outputs=\N$ and $f(x)=\N$ for all $x\in \N$.  Show that $\Pi\in \Psearch$ but $\Pi\notin \NPsearch$.  Thus, $\Psearch\nsubseteq\NPsearch$. \textit{Around 7-8 sentences}
 
 \begin{soln}
-
+$\Pi$ is solvable by taking the input and always returning $0$, which is in $f(x)=\N$. This is constant time, meaning $\Pi$ is in $\TIMEsearch(n^0)$ and therefore is also in $\Psearch$ by definition. However, $|x|$ is constant and for any polynomial $p$, $p(|x|)$ is finite. That means that for every input $x$ and every polynomial $p$, there exists a $y\in f(x)=\N$ that is larger than $p(|x|)$, breaking the first condition of membership for $\NPsearch$. Therefore $\Pi$ is in $\Psearch$ yet is not in $\NPsearch$, and thus $\Psearch\nsubseteq\NPsearch$.
 \end{soln}
 
 \item  Choose any computational problem you have studied in CS1200 which is in $\Psearch$. Explain why the same problem is in $\NPsearch$, and why the argument of the above nature does not apply to it. \textit{Around 6-8 sentences}
 
 \begin{soln}
-
+ SORT is in $\Psearch$ because it is solvable by MergeSort in $O(n \log n)$, meaning SORT is in $\TIMEsearch(n^2)$ and is in $\Psearch$. Because the members of $f(x)$ for sorting an array are exactly the same as $x$ except reordered, the identity polynomial covers $|y|\leq p(|x|)$. And if each key and value is also bound by $x$ (or is accounted for in $x$), each element of $y\in f(x)$ is also $<p(|x|)$. This means SORT has short valid outputs. Valid outputs to SORT are also easily checkable -- given $x$ and $y$, we can check $y$ is in order and contains the same elements as $x$ in $O(|x|)$ time, which is a polynomial time verifier. Therefore by definition SORT is in $\NPsearch$. The argument in (a) does not apply to SORT because valid outputs depend on the input, rather than $f(x)$ being an arbitrary and unbounded relative to $x$.
 \end{soln}
 
 \end{enumerate}
@@ -61,7 +61,7 @@ If you did not have any collaborators or external resources, please write 'none.
 \item OpenAI recently \href{https://openai.com/index/building-scientific-understanding-with-academic-communities/}{claimed} that $\ThreeSAT$ on $n$ variables can be solved in runtime $O(n^c) \cdot 2^{O(n/(\log n)^{1/2})}$, for constant $c$. Assume their claim is true. It is known that $\IndependentSet$ on a graph with $n$ vertices and $m$ edges can be reduced to $\ThreeSAT$ with $n$ variables in polynomial time and $\LongestPath(k)$ on a graph with $n$ vertices and $m$ edges can be reduced to $\ThreeSAT$ with $nk$ variables. For which of $\IndependentSet$ and $\LongestPath$ do you obtain an algorithm with runtime $2^{o(n)}$, where $o(n)$ is small-oh of $n$? (Note: $\LongestPath(k)$ also includes the case where $k=\omega(1)$). \textit{Max one page}
 
 \begin{soln}
-
+$n^c=2^{c\log n}=2^{O(\log n)}=2^{O(n/(\log n)^{1/2})}$, so the polynomial term is absorbed as $O(n^c) \cdot 2^{O(n/(\log n)^{1/2})}=2^{O(n/(\log n)^{1/2})}\cdot2^{O(n/(\log n)^{1/2})}=2^{2\cdot O(n/(\log n)^{1/2})}=2^{O(n/(\log n)^{1/2})}$ for the claimed $\ThreeSAT$ runtime. For the reduction from $\IndependentSet$, the oracle call will be on $n$ variables for a polynomial reduction plus oracle call runtime of $O(n^c\cdot m^c)+2^{O(n/(\log n)^{1/2})}=2^{O(n/(\log n)^{1/2})}$, because $m$ is at most $n$ choose 2 (polynomial). Since $n/(\log n)^{1/2}$ is sublinear, we know this runtime is also $2^{o(n)}$. For the reduction from $\LongestPath$, our input is $nk$ variables for a total runtime of $O(n^c\cdot k^c)+O(n^c\cdot k^c)\cdot2^{O(nk/(\log nk)^{1/2})}=2^{O(nk/(\log nk)^{1/2})}=2^{O(nk/(\log n+\log k)^{1/2})}$. Then, since $\LongestPath$ is trivial if $k\geq n$, we know $k<n$ and therefore $2^{O(nk/(\log k+\log n)^{1/2})}=2^{O(nk/(\log n)^{1/2})}$. So, as long as $k=o((\log n)^{1/2})$ even if it's $\omega(1)$, $2^{O(nk/(\log n)^{1/2})}=2^{o(n\cdot (\log n)^{1/2}/(\log n)^{1/2})}=2^{o(n)}$. However, if $k$ is still $\Omega((\log n)^{1/2})$, the bound on small o is broken. Therefore, while $\IndependentSet$ can reach $2^{o(n)}$ with the reduced runtime of $\ThreeSAT$, not every $k$ works with that runtime goal for $\LongestPath$.
 \end{soln}
 
 \item ($\NPsearch$-completeness) Consider the following variant of $k$-SAT.
@@ -75,7 +75,17 @@ If you did not have any collaborators or external resources, please write 'none.
 Prove that \FlipFourSAT\ is $\NPsearch$-complete by reduction from \ThreeSAT.  \textit{Max one page}
 
 \begin{soln}
+Let's say that $\ThreeSAT$'s inputs have $n$ variables. The reduction from $\ThreeSAT$ to $\FlipFourSAT$ is to add $x_n$ (an $n+1$th variable) to each clause of the 3-CNF. So there will still be the same number of clauses, but each clause will look like $(A\vee x_n)$. This set of clauses will be solved by a $\FlipFourSAT$ oracle on the same number of clauses, but with 1 additional variable and 1 additional literal per clause. Upon getting the result from the oracle, return $\bot$ for $\bot$. Otherwise, if the assignment for $x_n=1$ flip all assignments. Then, drop the $x_n$ variable and return the assignments for all other variables as the answer.
 
+Correctness of forward direction: If the 3-CNF input to $\ThreeSAT$ is satisfied by $\alpha\in\{0,1\}^n$, then by definition we know that if $A,\ldots,Z$ are the clauses of that 3-CNF, $\alpha$ satisfies $(A)\land\ldots\land(Z)$. That means the 4-CNF $(A\vee x_n)\land\ldots\land(Z\vee x_n)$ is satisfiable by $\alpha'$, where $\alpha'$ assigns the first $n$ variables exactly as $\alpha$ and $x_n=0$. This is because each clause already is satisfied by the first $n$ variables. Also, $\neg\alpha'$ satisfies the 4-CNF because each clause is satisfied by $x_n=1$. Thus, if the 3-CNF is satisfiable, the modified 4-CNF is flip-satisfiable, and our oracle will return an assignment (not $\bot$).
+
+Correctness of the backward direction: If the 4-CNF $(A\vee x_n)\land\ldots\land(Z\vee x_n)$ is flip-satisfied by $\alpha'$ and $\neg\alpha'$, then at least one of them has assigned $x_n=0$. Substituting that into the 4-CNF, we know that $(A\vee0)\land\ldots\land(Z\vee0)$ is satisfiable by the first $n$ assigned variables, too. That means that $(A)\land\ldots\land(Z)$ is satisfiable by the modified assignment from the oracle, so if the 4-CNF has a flip satisfying assignment, the original 3-CNF has a satisfying assignment.
+
+Therefore, the reduction produces a satisfying assignment iff the oracles produces one, and the reduction is correct.
+
+For runtime, treating the oracle call as one step, we take on the order of the number of clauses $O(|C|)$ to make a modified 4-CNF, modifying each clause once. Then, the oracle takes 1 step, and (not) returning $\bot$ takes $O(1)$ time. Finally, it takes $O(n)$ time to (not) flip $\alpha'$ and $O(1)$ to remove the $x_n=0$ assignment and return the whole thing. In total, that's an $O(|C|+n)$ runtime reduction from $\ThreeSAT$ to $\FlipFourSAT$.
+
+Since $\FlipFourSAT$ has an output of exactly $n+1$ elements long, and since that output is verifiable (by substituting into the 4-CNF) with time on the order of number of clauses in the 4-CNF, we can say the problem has short outputs and is quickly verifiable. And since we've shown a polynomial time reduction from $\ThreeSAT$, we can say$\FlipFourSAT$ is $\NPsearch$-complete.
 \end{soln}
 
 \item (Factoring if $\NPsearch\subset \Psearch$) Every time your browser or one of your apps makes a secure connection to a website or server, it uses cryptography to make sure that eavesdroppers to the network cannot decipher the information you are transmitting. Factoring a large number is an important part of cryptography, and the basis for the RSA encryption. Lets define the computational problem formally.
@@ -86,7 +96,11 @@ Prove that \FlipFourSAT\ is $\NPsearch$-complete by reduction from \ThreeSAT.  \
 Show that if $\NPsearch\subset \Psearch$, then there is an algorithm to solve \Factoring in time $O((\log N)^c)$, for some $c=O(1)$. Be careful about the length of input in base 2. \textit{(around 1/2 page)}
 
 \begin{soln}
+Yes, in fact $\Factoring$ can be solved in $O(1)$ by returning the pair $1$ and $N$ in base 2. Take that, encryption!
 
+Jokes aside, let's disqualify the trivial solutions to $\Factoring$ as it is currently phrased. For any natural number $N$, it is representable in base 2 in $\lceil\lg N\rceil+1$ bits. Let's assume every input $N$ follows this input size. For every valid output to $\Factoring$, we know natural numbers $P,Q\leq N$, so the total size of all valid outputs are at most $\leq2\lceil\lg N\rceil+2$. And the verifier for outputs to $\Factoring$ is just to multiply $P\times Q$ and check it's equal to $N$ without being a trivial solution, which is achievable in $O(n^2)$ naively. Thus, there exists a polynomial that bounds output size, element magnitude, and verifier runtime. Therefore $\Factoring$ is in $\NPsearch$.
+
+Thus, if $\NPsearch\subset\Psearch$, there must also be an algorithm solving $\Factoring$ in polynomial time. Since input size for $\Factoring$ is $\lceil\lg N\rceil+1$, that means there exists an algorithm solving it in $O((\log N)^c)$.
 \end{soln}
 
 \textit{(Fun Fact: A remarkable property of quantum computers is that they can solve \Factoring in polynomial time, via Shor's algorithm. This does not mean that quantum computers can solve any problem in $\NPsearch$ in polynomial time, as \Factoring is not believed to be $\NPsearch$-complete).
@@ -99,7 +113,7 @@ Quick note on grading: Good responses are usually about a paragraph, with someth
 \textit{Note: As with the previous psets, you may include your answer in your PDF submission, but the answer should ultimately go into a separate Gradescope submission form.}
 
 \begin{soln}
-
+I love the idea that a verifiable search is reducible to SAT. Cool people have proved that every set of correctness criteria is translatable to binary variables, and with a standardized way of presenting those variables, we can use specialized programs to scrape for a solution to the search. This is beautiful to me because it means a whole class of problems can use one heavily optimized solver that the community has been working on for decades. And even though these search problems are very difficult and sometimes very niche, we can abstract the issue enough to take advantage of generations of human knowledge in a completely different field, removing the need for specialized research in some rare area of application. Super cool.
 \end{soln}
 
 \item Once you're done with this problem set, please fill out \href{https://forms.gle/b2yJAorxffJSueVd6}{this survey} so that we can gather students' thoughts on the problem set, and the class in general. It's not required, but we really appreciate all responses!
